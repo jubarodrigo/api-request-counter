@@ -1,0 +1,14 @@
+FROM golang:1.22-alpine
+
+RUN apk update && apk add --no-cache gcc g++
+RUN apk update && apk add --no-cache gcc g++ git
+
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+WORKDIR /app
+
+COPY . .
+
+EXPOSE 2345
+
+CMD ["/app/main"]

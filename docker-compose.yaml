@@ -1,0 +1,19 @@
+version: "3.8"
+
+networks:
+  counter:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: config/local/Dockerfile.local
+    command: go run main.go
+    ports:
+      - 8090:8090
+      - 2345:2345
+    volumes:
+      - ./:/storage
+    networks:
+      - counter
