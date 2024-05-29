@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sync"
-	"time"
 
 	geometryDomain "counter/domain/counter"
 )
@@ -17,38 +15,53 @@ func NewCounterService() geometryDomain.RequestCounterService {
 
 type CounterService struct{}
 
-const dataFile = "data.txt"
+const dataFile = "./storage/files/data.txt"
 
-var (
-	requestCount  int
-	mu            sync.RWMutex
-	lastTimestamp int64
-)
-
-func (cr *CounterService) CountRequest(ctx context.Context) error {
-	now := time.Now().Unix()
-	if now-lastTimestamp >= 60 {
-		requestCount = 0
-		lastTimestamp = now
+func (cr *CounterService) CountRequest(ctx context.Context) (int32, error) {
+	requestCount, err := cr.loadData()
+	if err != nil {
+		return 0, err
 	}
 
 	requestCount++
 
-	return nil
-}
-
-func loadData() {
-	file, err := os.Open(dataFile)
-	if err == nil {
-		fmt.Fscanf(file, "%d %d", &requestCount, &lastTimestamp)
+	err = cr.saveData(requestCount)
+	if err != nil {
+		return 0, err
 	}
-	file.Close()
+
+	return requestCount, nil
 }
 
-func saveData() {
+func (cr *CounterService) loadData() (int32, error) {
+	var requests int32
+
+	file, err := os.Open(dataFile)
+	if err != nil {
+		return 0, err
+	}
+
+	fmt.Fscanf(file, "%d", &requests)
+
+	err = file.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	return requests, nil
+}
+
+func (cr *CounterService) saveData(requestCount int32) error {
+	fmt.Println("Request to save: ", requestCount)
 	file, err := os.Create(dataFile)
 	if err == nil {
-		fmt.Fprintf(file, "%d %d", requestCount, lastTimestamp)
+		fmt.Fprintf(file, "%d", requestCount)
 	}
-	file.Close()
+
+	err = file.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

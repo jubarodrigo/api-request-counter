@@ -3,7 +3,6 @@ package cmd
 import (
 	cunterService "counter/domain/counter"
 	"counter/domain/counter/services"
-	config "counter/internal"
 )
 
 type Counter struct {
@@ -35,7 +34,7 @@ func (sm *BuildDirector) BuildCounter() {
 }
 
 func (sm *Counter) setConfig() {
-	_ := config.GetEnvOrDefault("ENV_FILE_PATH", ".env")
+	// _ := config.GetEnvOrDefault("ENV_FILE_PATH", ".env")
 }
 
 func (sm *Counter) setServices() {

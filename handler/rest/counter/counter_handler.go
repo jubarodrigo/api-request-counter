@@ -2,6 +2,7 @@ package counter
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	counterService "counter/domain/counter"
@@ -21,10 +22,12 @@ func NewCounterRequestHandle(geometryService counterService.RequestCounterServic
 func (sfh *CounterRequestHandle) GetCounterRequests(c echo.Context) error {
 	ctx := context.Background()
 
-	err := sfh.counterService.CountRequest(ctx)
+	counter, err := sfh.counterService.CountRequest(ctx)
 	if err != nil {
 		return c.JSON(http.StatusBadGateway, err)
 	}
 
-	return c.JSON(http.StatusOK, "Request Counted")
+	requests := fmt.Sprintf("Requests Total: %d", counter)
+
+	return c.JSON(http.StatusOK, requests)
 }

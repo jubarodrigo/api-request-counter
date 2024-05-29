@@ -5,5 +5,5 @@ import (
 )
 
 type RequestCounterService interface {
-	CountRequest(ctx context.Context) error
+	CountRequest(ctx context.Context) (int32, error)
 }

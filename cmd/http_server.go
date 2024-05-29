@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"counter/bin"
 	counterService "counter/domain/counter"
 	"counter/handler/rest/counter"
 	"github.com/labstack/echo/v4"
@@ -9,6 +10,8 @@ import (
 func StartHttpServer(geometryService counterService.RequestCounterService) {
 	e := echo.New()
 	e.HideBanner = true
+
+	go bin.RunTicker()
 
 	geometryAnalysisHandle := counter.NewCounterRequestHandle(geometryService)
 
