@@ -2,16 +2,17 @@ package cmd
 
 import (
 	"counter/bin"
+	"counter/config"
 	counterService "counter/domain/counter"
 	"counter/handler/rest/counter"
 	"github.com/labstack/echo/v4"
 )
 
-func StartHttpServer(geometryService counterService.RequestCounterService) {
+func StartHttpServer(geometryService counterService.RequestCounterService, fileConfig config.FileConfig) {
 	e := echo.New()
 	e.HideBanner = true
 
-	go bin.RunTicker()
+	go bin.RunTicker(fileConfig)
 
 	geometryAnalysisHandle := counter.NewCounterRequestHandle(geometryService)
 

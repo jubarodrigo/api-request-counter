@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"counter/config"
 	cunterService "counter/domain/counter"
 	"counter/domain/counter/services"
 )
 
 type Counter struct {
 	GeometryService cunterService.RequestCounterService
+	FileConfig      config.FileConfig
 }
 
 func NewCounter() *Counter { return &Counter{} }
@@ -34,13 +36,14 @@ func (sm *BuildDirector) BuildCounter() {
 }
 
 func (sm *Counter) setConfig() {
-	// _ := config.GetEnvOrDefault("ENV_FILE_PATH", ".env")
+	env := config.GetEnvOrDefault("ENV_FILE_PATH", ".env")
+	config.MustParseConfig(env, &sm.FileConfig)
 }
 
 func (sm *Counter) setServices() {
-	sm.GeometryService = services.NewCounterService()
+	sm.GeometryService = services.NewCounterService(sm.FileConfig)
 }
 
 func (sm *Counter) setHttpServer() {
-	StartHttpServer(sm.GeometryService)
+	StartHttpServer(sm.GeometryService, sm.FileConfig)
 }

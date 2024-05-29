@@ -4,34 +4,29 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"counter/config"
 )
 
-func createFile() {
-	fileName := "./storage/files/data.txt"
+const tickerTime = 1 * time.Minute
 
-	file, err := os.Create(fileName)
+func createFile(filePath string) {
+	file, err := os.Create(filePath)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return
 	}
-
 	defer file.Close()
-	now := time.Now().Format("2006-01-02 15:04:05")
-	_, err = file.WriteString(fmt.Sprintf("Current time: %s", now))
-	if err != nil {
-		fmt.Println("Error writing to file:", err)
-		return
-	}
 }
 
-func RunTicker() {
-	createFile()
-	ticker := time.NewTicker(1 * time.Minute)
+func RunTicker(fileConfig config.FileConfig) {
+	createFile(fileConfig.FilePath)
+	ticker := time.NewTicker(tickerTime)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			createFile()
+			createFile(fileConfig.FilePath)
 		}
 	}
 }

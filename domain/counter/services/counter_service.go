@@ -2,20 +2,24 @@ package services
 
 import (
 	"context"
+	"counter/config"
 	"fmt"
 	"os"
 
 	geometryDomain "counter/domain/counter"
 )
 
-func NewCounterService() geometryDomain.RequestCounterService {
-
-	return &CounterService{}
+func NewCounterService(fileConfig config.FileConfig) geometryDomain.RequestCounterService {
+	return &CounterService{
+		fileConfig: fileConfig,
+	}
 }
 
-type CounterService struct{}
+const errorFileOperation = "service: error with file operation: %w"
 
-const dataFile = "./storage/files/data.txt"
+type CounterService struct {
+	fileConfig config.FileConfig
+}
 
 func (cr *CounterService) CountRequest(ctx context.Context) (int32, error) {
 	requestCount, err := cr.loadData()
@@ -36,31 +40,30 @@ func (cr *CounterService) CountRequest(ctx context.Context) (int32, error) {
 func (cr *CounterService) loadData() (int32, error) {
 	var requests int32
 
-	file, err := os.Open(dataFile)
+	file, err := os.Open(cr.fileConfig.FilePath)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf(errorFileOperation, err)
 	}
 
 	fmt.Fscanf(file, "%d", &requests)
 
 	err = file.Close()
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf(errorFileOperation, err)
 	}
 
 	return requests, nil
 }
 
 func (cr *CounterService) saveData(requestCount int32) error {
-	fmt.Println("Request to save: ", requestCount)
-	file, err := os.Create(dataFile)
+	file, err := os.Create(cr.fileConfig.FilePath)
 	if err == nil {
 		fmt.Fprintf(file, "%d", requestCount)
 	}
 
 	err = file.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf(errorFileOperation, err)
 	}
 
 	return nil

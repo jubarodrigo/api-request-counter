@@ -9,17 +9,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type CounterRequestHandle struct {
+type RequestHandle struct {
 	counterService counterService.RequestCounterService
 }
 
-func NewCounterRequestHandle(geometryService counterService.RequestCounterService) *CounterRequestHandle {
-	return &CounterRequestHandle{
+func NewCounterRequestHandle(geometryService counterService.RequestCounterService) *RequestHandle {
+	return &RequestHandle{
 		counterService: geometryService,
 	}
 }
 
-func (sfh *CounterRequestHandle) GetCounterRequests(c echo.Context) error {
+func (sfh *RequestHandle) GetCounterRequests(c echo.Context) error {
 	ctx := context.Background()
 
 	counter, err := sfh.counterService.CountRequest(ctx)

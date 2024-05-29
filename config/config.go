@@ -8,6 +8,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type FileConfig struct {
+	FilePath string `envconfig:"FILE_PATH"`
+}
+
 func MustParseConfig(envPath string, c interface{}) {
 	err := godotenv.Load(envPath)
 	if err != nil {
